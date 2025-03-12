@@ -6,8 +6,7 @@ import { body, validationResult } from 'express-validator';
 export const validateSignUp = [
     body('nombre').notEmpty().withMessage('El nombre es requerido'),
     body('correo').isEmail().withMessage('Correo inválido'),
-    body('contraseña').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-    body('rol').notEmpty().withMessage('El rol es requerido')
+    body('contraseña').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
 ];
 
 export async function signUp(req, res) {
@@ -16,11 +15,11 @@ export async function signUp(req, res) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { nombre, correo, contraseña, rol } = req.body;
+    const { nombre, correo, contraseña } = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(contraseña, 10);
-        const nuevoUsuario = await createUser(nombre, correo, hashedPassword, rol);
+        const nuevoUsuario = await createUser(nombre, correo, hashedPassword, "usuario");
         res.status(201).json({ mensaje: 'Usuario registrado', usuario: nuevoUsuario });
     } catch (error) {
         res.status(500).json({ error: 'Error en el registro' });
