@@ -74,3 +74,28 @@ export async function cambioAtributo(atributo, valor, id_evento) {
         throw error; // Lanza el error para manejarlo en otro lugar
     }
 }
+export async function getAllEventsFromUserOrganizations(id_usuario) {
+    try {
+        const [organizations] = await pool.query(`
+            SELECT id_organizacion 
+            FROM user_organizacion
+            WHERE id_usuario = ?
+        `, [id_usuario]);
+
+        if (organizations.length === 0) {
+            return [];
+        }
+
+        const organizationIds = organizations.map(org => org.id_organizacion);
+        const [events] = await pool.query(`
+            SELECT * 
+            FROM eventos
+            WHERE id_organizacion IN (?)
+        `, [organizationIds]);
+
+        return events;
+    } catch (error) {
+        console.error("Error al obtener los eventos de las organizaciones del usuario:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar
+    }
+}

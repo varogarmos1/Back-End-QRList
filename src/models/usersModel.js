@@ -26,19 +26,6 @@ export async function postUser(nombre_apellidos, correo, contraseña, rol) {
     throw error; // Lanza el error para manejarlo en otro lugar
     }
 }
-export async function cambioRol(id_usuario, rol) {
-  try {
-      const [result] = await pool.query(`
-         UPDATE users SET rol = ? WHERE id = ?;
-          `, [rol, id_usuario])
-          return result.affectedRows;
-        
-      } catch (error) {
-          console.error("Error cambioRol:", error);
-        throw error; // Lanza el error para manejarlo en otro lugar
-        }
-}
-
 
 
   export async function getUserIdByName(nombre) {

@@ -1,5 +1,19 @@
 import {pool} from '../config/db.js';
 
+export async function getAsistente(id_evento, nombre_apellidos) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT * 
+            FROM asistentes
+            WHERE id_evento = ? AND nombre_apellidos = ?
+        `, [id_evento, nombre_apellidos]);
+        return rows[0];
+    } catch (error) {
+        console.error("Error al obtener asistente:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar
+    }
+}
+
 
 export async function getAllAsistentes(id_evento) {
     try {
