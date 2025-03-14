@@ -40,12 +40,12 @@ export async function cambioEstado(correo,id_evento, estado) {
           throw error; // Lanza el error para manejarlo en otro lugar
           }
 }
-export async function postAsistNoReg(id_evento, nombre_apellidos, correo){
+export async function postAsistNoReg(id_evento, nombre_apellidos, correo, id_entrada_evento){
     try {
         const [result] = await pool.query(`
-          INSERT INTO asistentes (id_evento, nombre_apellidos, correo)
-          VALUES (?, ?, ?)
-          `, [id_evento, nombre_apellidos, correo])
+          INSERT INTO asistentes (id_evento, nombre_apellidos, correo, id_entrada_evento)
+          VALUES (?, ?, ?, ?)
+          `, [id_evento, nombre_apellidos, correo, id_entrada_evento])
           return result.insertId;
         
       } catch (error) {
@@ -54,12 +54,12 @@ export async function postAsistNoReg(id_evento, nombre_apellidos, correo){
         }
 }
 
-export async function postAsistReg(id_evento, id_usuario, nombre_apellidos, correo){
+export async function postAsistReg(id_evento, id_usuario, nombre_apellidos, correo, id_entrada_evento){
     try {
         const [result] = await pool.query(`
-          INSERT INTO asistentes (id_evento,id_usuario, nombre_apellidos, correo)
-          VALUES (?, ?,?, ?)
-          `, [id_evento,id_usuario, nombre_apellidos, correo])
+          INSERT INTO asistentes (id_evento,id_usuario, nombre_apellidos, correo, id_entrada_evento)
+          VALUES (?, ?,?, ?, ?)
+          `, [id_evento,id_usuario, nombre_apellidos, correo, id_entrada_evento])
           return result.insertId;
         
       } catch (error) {
