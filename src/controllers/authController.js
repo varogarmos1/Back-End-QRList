@@ -1,6 +1,6 @@
-import { getUserByEmail, createUser } from '../models/userModel.js';
+import { getUserByEmail, postUser } from '../models/usersModel.js';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
 
 export const validateSignUp = [
@@ -19,7 +19,7 @@ export async function signUp(req, res) {
 
     try {
         const hashedPassword = await bcrypt.hash(contraseña, 10);
-        const nuevoUsuario = await createUser(nombre, correo, hashedPassword, "usuario");
+        const nuevoUsuario = await postUser(nombre, correo, hashedPassword);
         res.status(201).json({ mensaje: 'Usuario registrado', usuario: nuevoUsuario });
     } catch (error) {
         res.status(500).json({ error: 'Error en el registro' });
