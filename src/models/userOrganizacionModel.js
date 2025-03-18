@@ -48,3 +48,15 @@ export async function removeUserFromOrganizacion(id_usuario, id_organizacion) {
         throw error; // Lanza el error para manejarlo en otro lugar
     }
 }
+
+export async function getAllUserIdsFromOrganizacion(id_organizacion) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT id_usuario FROM user_organizacion WHERE id_organizacion = ?
+        `, [id_organizacion]);
+        return rows.map(row => row.id_usuario);
+    } catch (error) {
+        console.error("Error al obtener todos los IDs de usuarios de la organización:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar
+    }
+}

@@ -1,6 +1,5 @@
 import {pool} from '../config/db.js';
 
-
 export async function getUser(id) {
     const [rows] = await pool.query(`
     SELECT * 
@@ -27,6 +26,17 @@ export async function postUser(nombre_apellidos, correo, contraseña, rol) {
     }
 }
 
+export async function getUsersByIds(ids) {
+    try {
+        const [rows] = await pool.query(`
+            SELECT * FROM users WHERE id IN (?)
+        `, [ids]);
+        return rows;
+    } catch (error) {
+        console.error("Error al obtener usuarios por IDs:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar
+    }
+}
 
   export async function getUserIdByName(nombre) {
       try {
@@ -92,4 +102,3 @@ export async function getUserByEmail(correo) {
     throw error; // Lanza el error para manejarlo en otro lugar
   }
 }
-  
