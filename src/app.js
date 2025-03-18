@@ -13,7 +13,7 @@ const app = express();
 // app.get('/', getUser);
 app.use(express.json());
 
-app.use('/api/user-organizacion', userOrgRouter);
+app.use('/api/organizaciones', userOrgRouter);
 app.use('/api/auth', authRouter);
 app.use(manejoErrores);
 // app.use('/api/users', userRoutes);

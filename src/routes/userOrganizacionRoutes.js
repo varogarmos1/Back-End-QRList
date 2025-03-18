@@ -12,35 +12,35 @@ import {
 const userOrgRouter = express.Router();
 
 userOrgRouter.post(
-    '/',
+    '/:nombre_organizacion/usuarios',
     verificarToken,
     verificarRol('admin', 'relaciones'),
     addUser
 );
 
 userOrgRouter.get(
-    '/:id_usuario/:id_organizacion',
+    '/:nombre_organizacion/usuarios/:id_usuario',
     verificarToken,
     verificarRol('admin', 'relaciones'),
     getUser
 );
 
 userOrgRouter.get(
-    '/organizacion/:id_organizacion/usuarios',
+    '/:nombre_organizacion/usuarios',
     verificarToken,
     verificarRol('admin', 'relaciones'),
     getAllUsers
 );
 
 userOrgRouter.put(
-    '/:id_usuario/:id_organizacion',
+    '/:nombre_organizacion/usuarios/:id_usuario',
     verificarToken,
     verificarRol('admin', 'relaciones'),
     updateUserRol
 );
 
 userOrgRouter.delete(
-    '/:id_usuario/:id_organizacion',
+    '/:nombre_organizacion/usuarios/:id_usuario',
     verificarToken,
     verificarRol('admin', 'relaciones'),
     removeUser
