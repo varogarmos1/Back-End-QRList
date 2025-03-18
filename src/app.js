@@ -5,13 +5,16 @@ import { getUser } from './models/usersModel.js';
 import { getEventosFromUser } from './models/eventosModel.js';
 // const userRoutes = require('./routes/userRoutes');
 import { manejoErrores } from '../middlewares/manejoErrores.js';
-
+import userOrgRouter from './routes/userOrganizacionRoutes.js';
+import authRouter from './routes/authRoutes.js';
 
 const app = express();
 
 // app.get('/', getUser);
 app.use(express.json());
 
+app.use('/api/user-organizacion', userOrgRouter);
+app.use('/api/auth', authRouter);
 app.use(manejoErrores);
 // app.use('/api/users', userRoutes);
 
