@@ -29,7 +29,7 @@ export async function postUser(nombre_apellidos, correo, contraseña, rol) {
 export async function getUsersByIds(ids) {
     try {
         const [rows] = await pool.query(`
-            SELECT * FROM users WHERE id IN (?)
+            SELECT id, nombre_apellidos, correo, rol FROM users WHERE id IN (?)
         `, [ids]);
         return rows;
     } catch (error) {

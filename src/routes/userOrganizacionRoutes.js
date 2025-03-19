@@ -1,10 +1,10 @@
 import express from 'express';
 import { verificarToken } from '../middleware/verificarToken.js';
-import { verificarRol } from '../middleware/verificarRol.js';
+import { verificarPermisos } from '../middleware/verificarPermisos.js';
 import {
     addUser,
     getUser,
-    updateUserRol,
+    updateUserPermisos,	
     removeUser,
     getAllUsers
 } from '../controllers/userOrganizacionController.js';
@@ -14,35 +14,35 @@ const userOrgRouter = express.Router();
 userOrgRouter.post(
     '/:nombre_organizacion/usuarios',
     verificarToken,
-    verificarRol('admin', 'relaciones'),
+    verificarPermisos('super-admin','admin','relaciones'),
     addUser
 );
 
 userOrgRouter.get(
-    '/:nombre_organizacion/usuarios/:id_usuario',
+    '/:nombre_organizacion/usuarios/:codigo_vendedor',
     verificarToken,
-    verificarRol('admin', 'relaciones'),
+    verificarPermisos('super-admin','admin','relaciones'),
     getUser
 );
 
 userOrgRouter.get(
     '/:nombre_organizacion/usuarios',
     verificarToken,
-    verificarRol('admin', 'relaciones'),
+    verificarPermisos('super-admin','admin','relaciones'),
     getAllUsers
 );
 
 userOrgRouter.put(
-    '/:nombre_organizacion/usuarios/:id_usuario',
+    '/:nombre_organizacion/usuarios/:codigo_vendedor',
     verificarToken,
-    verificarRol('admin', 'relaciones'),
-    updateUserRol
+    verificarPermisos('super-admin','admin','relaciones'),
+    updateUserPermisos
 );
 
 userOrgRouter.delete(
-    '/:nombre_organizacion/usuarios/:id_usuario',
+    '/:nombre_organizacion/usuarios/:codigo_vendedor',
     verificarToken,
-    verificarRol('admin', 'relaciones'),
+    verificarPermisos('super-admin','admin','relaciones'),
     removeUser
 );
 
