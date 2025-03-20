@@ -53,7 +53,7 @@ export async function login(req, res) {
                 rol: usuario.rol
             },
             process.env.JWT_SECRET,
-            { expiresIn: '3h' }
+            { expiresIn: '5h' }
         );
         res.json({ token });
     } catch (error) {

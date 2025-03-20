@@ -1,11 +1,11 @@
 import { pool } from '../config/db.js';
 
-export async function createOrganizacion(nombre, descripcion, id_super_admin) {
+export async function createOrganizacion(nombre, descripcion, codigo, id_super_admin ) {
     try {
         const [result] = await pool.query(`
-            INSERT INTO organizaciones (nombre, descripcion, id_super_admin)
-            VALUES (?, ?, ?)
-        `, [nombre, descripcion, id_super_admin]);
+            INSERT INTO organizaciones (nombre, descripcion, codigo, id_super_admin)
+            VALUES (?, ?, ?, ?)
+        `, [nombre, descripcion,codigo, id_super_admin]);
         return result.insertId;
     } catch (error) {
         console.error("Error al crear organización:", error);
@@ -13,11 +13,11 @@ export async function createOrganizacion(nombre, descripcion, id_super_admin) {
     }
 }
 
-export async function getOrganizacionById(id) {
+export async function getOrganizacionByCodigo(codigo) {
     try {
         const [rows] = await pool.query(`
-            SELECT * FROM organizaciones WHERE id = ?
-        `, [id]);
+            SELECT * FROM organizaciones WHERE codigo = ?
+        `, [codigo]);
         return rows[0];
     } catch (error) {
         console.error("Error al obtener organización:", error);
@@ -36,11 +36,11 @@ export async function getOrganizacionIdByName(name) {
     }
 }
 
-export async function updateOrganizacion(id, nombre, descripcion) {
+export async function updateOrganizacion(codigo, nombre, descripcion) {
     try {
         const [result] = await pool.query(`
-            UPDATE organizaciones SET nombre = ?, descripcion = ? WHERE id = ?
-        `, [nombre, descripcion, id]);
+            UPDATE organizaciones SET nombre = ?, descripcion = ? WHERE codigo = ?
+        `, [nombre, descripcion, codigo]);
         return result.affectedRows;
     } catch (error) {
         console.error("Error al actualizar organización:", error);
@@ -48,11 +48,11 @@ export async function updateOrganizacion(id, nombre, descripcion) {
     }
 }
 
-export async function deleteOrganizacion(id) {
+export async function deleteOrganizacion(codigo) {
     try {
         const [result] = await pool.query(`
-            DELETE FROM organizaciones WHERE id = ?
-        `, [id]);
+            DELETE FROM organizaciones WHERE codigo = ?
+        `, [codigo]);
         return result.affectedRows;
     } catch (error) {
         console.error("Error al eliminar organización:", error);

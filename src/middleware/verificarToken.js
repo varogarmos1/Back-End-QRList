@@ -5,7 +5,7 @@ dotenv.config();
 
 export function verificarToken(req, res, next) {
     const token = req.header('Authorization'); // Leer el token del header
-
+    
     if (!token) {
         return res.status(401).json({ error: 'Acceso denegado. Token no proporcionado' });
     }
