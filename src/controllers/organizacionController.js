@@ -7,7 +7,7 @@ import {
 } from '../models/organizacionModel.js';
 
 // Función auxiliar para transformar el nombre de la organización
-async function generarCodigo(nombre) {
+export async function generarCodigo(nombre) {
     // Convertir a minúsculas
     let codigo = nombre.toLowerCase();
     // Eliminar acentos
@@ -22,8 +22,8 @@ export async function createOrganizacionController(req, res) {
     const { id } = req.usuario;
     try {
         // Generar el código de la organización
-        const codigo = await generarCodigo(nombre);
-        const id_organizacion = await createOrganizacion(nombre, descripcion, codigo, id );
+        const codigo_org = await generarCodigo(nombre);
+        const id_organizacion = await createOrganizacion(nombre, descripcion, codigo_org, id );
         res.status(201).json({ id_organizacion });
     } catch (error) {
         res.status(500).json({ error: 'Error al crear organización' });
@@ -31,10 +31,10 @@ export async function createOrganizacionController(req, res) {
 }
 
 export async function getOrganizacionByCodigoController(req, res) {
-    const { codigo } = req.params;
+    const { codigo_org } = req.params;
     if(req.pertenece === true){
         try {
-            const organizacion = await getOrganizacionByCodigo(codigo);
+            const organizacion = await getOrganizacionByCodigo(cocodigo_orgdigo);
             if (organizacion) {
                 res.status(200).json(organizacion);
             } else {
@@ -47,12 +47,12 @@ export async function getOrganizacionByCodigoController(req, res) {
 }
 
 export async function updateOrganizacionController(req, res) {
-    const { codigo } = req.params;
-    console.log('Actualizando organización', codigo);
+    const { codigo_org } = req.params;
+    console.log('Actualizando organización', codigo_org);
     const { nombre, descripcion } = req.body;
     console.log('Datos:', nombre, descripcion);
     try {
-        const affectedRows = await updateOrganizacion(codigo, nombre, descripcion);
+        const affectedRows = await updateOrganizacion(codigo_org, nombre, descripcion);
         if (affectedRows > 0) {
             res.status(200).json({ message: 'Organización actualizada' });
         } else {
@@ -64,9 +64,9 @@ export async function updateOrganizacionController(req, res) {
 }
 
 export async function deleteOrganizacionController(req, res) {
-    const { codigo } = req.params;
+    const { codigo_org } = req.params;
     try {
-        const affectedRows = await deleteOrganizacion(codigo);
+        const affectedRows = await deleteOrganizacion(codigo_org);
         if (affectedRows > 0) {
             res.status(200).json({ message: 'Organización eliminada' });
         } else {

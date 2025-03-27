@@ -8,10 +8,17 @@ import {
 import { verificarToken } from '../middleware/verificarToken.js';
 import { verificarRolDev } from '../middleware/verificarRolDev.js';
 import { verificarPertenencia } from '../middleware/verificarPertenencia.js';
-import userOrgRouter from './userOrganizacionRoutes.js';
 import { verificarPermisos } from '../middleware/verificarPermisos.js';
+import userOrgRouter from './userOrganizacionRoutes.js';
+import eventosRouter from './eventosRoutes.js';
 
 const orgRouter = express.Router();
+
+
+orgRouter.use('/:codigo_org/events', eventosRouter);
+orgRouter.use('/:codigo_org/usuarios', userOrgRouter);
+
+
 orgRouter.post(
     '/',
     verificarToken,
@@ -20,25 +27,24 @@ orgRouter.post(
 
 
 orgRouter.get(
-    '/:codigo',
+    '/:codigo_org',
     verificarToken,
     verificarPertenencia,
     getOrganizacionByCodigoController);
 
 
 orgRouter.put(
-    '/:codigo',
+    '/:codigo_org',
     verificarToken,
     verificarPermisos('super-admin', 'admin'),
     updateOrganizacionController);
 
 
 orgRouter.delete(
-    '/:codigo',
+    '/:codigo_org',
     verificarToken,
     verificarRolDev,
     deleteOrganizacionController);
 
-//orgRouter.use('/:nombre_organizacion/usuarios', userOrgRouter);
 
 export default orgRouter;
