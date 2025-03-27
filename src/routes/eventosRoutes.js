@@ -1,12 +1,40 @@
 import express from 'express'
-import { createEvent, updateEventAttribute, deleteEvent } from '../controllers/eventosController';
-import { authenticateJWT } from '../middlewares/authenticateJWT';
+import { createNewEvento, getEventos, getEventoByCodigoController, updateExistingEvento, deleteEventoById} from '../controllers/eventosController.js';
+import { verificarPermisos } from '../middleware/verificarPermisos.js';
+import { verificarToken } from '../middleware/verificarToken.js';
+import { verificarPertenencia } from '../middleware/verificarPertenencia.js';
 
 
 
-const eventosRouter = express.Router();
-eventosRouter.use(express.json());
+const eventosRouter = express.Router({ mergeParams: true });
 
-router.post('/event', authenticateJWT, createEvent);
-router.put('/event/:nombre_usuario/:nombre_evento', authenticateJWT, updateEventAttribute);
-router.delete('/event/:id', authenticateJWT, deleteEvent);
+
+eventosRouter.get('/',
+    getEventos);
+
+    
+
+eventosRouter.get('/:codigo_evento',
+    getEventoByCodigoController);
+
+
+eventosRouter.post(
+    '/',
+    verificarToken,
+    verificarPermisos('super-admin','admin'),
+    createNewEvento);
+
+eventosRouter.put(
+    '/:codigo_evento',
+    verificarToken,
+    verificarPermisos('super-admin','admin'),
+    updateExistingEvento);
+
+
+eventosRouter.delete('/:codigo_evento',
+    verificarToken,
+    verificarPermisos('super-admin','admin'),
+    deleteEventoById
+);
+
+export default eventosRouter;

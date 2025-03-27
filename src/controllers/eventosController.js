@@ -1,108 +1,106 @@
-import { createEventos, cambioAtributo, deleteEvento, getEventoFromOrganization, getEventosFromOrganization } from '../models/eventosModel';
-import { getUserNamebyId } from '../models/userModel';
+import {
+    getAllEventosFromOrg,
+    getEventoByIdFrom,
+    getEventoByCodigo,
+    createEvento,
+    updateEvento,
+    deleteEvento
+} from '../models/eventosModel.js';
+import { getOrganizacionByCodigo } from '../models/organizacionModel.js';
+import {generarCodigo} from '../controllers/organizacionController.js';  
 
-//POST /api/usuarios/:nombre_usuario/eventos
-//Crea un evento para un usuario
-export const createEvent = async (req, res) => {
-    const { nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, precio_entrada, id_organizacion, estado } = req.body;
+// Obtener todos los eventos de una organización
+export async function getEventos(req, res) {
     try {
-        const id_creador = req.usuario.id;
-        const eventId = await createEventos(nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, precio_entrada, id_organizacion, id_creador, estado);
-        res.status(201).json({ message: 'Evento creado correctamente', eventId });
+        const { codigo_org } = req.params;
+        console.log(codigo_org);
+        const organizacion = await getOrganizacionByCodigo(codigo_org);
+        if (!organizacion) {
+            return res.status(404).json({ error: "Organización no encontrada" });
+        }
+        const eventos = await getAllEventosFromOrg(organizacion.id);
+        res.json(eventos);
     } catch (error) {
-        console.error("Error al crear evento:", error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        res.status(500).json({ error: "Error al obtener los eventos" });
     }
-};
+}
 
-//PUT /api/usuarios/:nombre_usuario/eventos/:nombre_evento
-//Actualiza un atributo de un evento
-export const updateEventAttribute = async (req, res) => {
-    const { nombre_usuario, nombre_evento } = req.params;
-    const { atributo, valor } = req.body;
-    try {
-        const id_usuario = await getUserNamebyId(nombre_usuario);
-        if (!id_usuario) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        const evento = await getEventoFromOrganization(id_usuario, nombre_evento);
-        if (!evento) {
-            return res.status(404).json({ message: 'Evento no encontrado' });
-        }
-        const creador = evento.id_creador;
-        if (creador !== id_usuario) {
-            return res.status(403).json({ message: 'No tiene permiso para modificar este evento' });
-        }
-        const result = await cambioAtributo(atributo, valor, evento.id);
-        if (result === 0) {
-            return res.status(404).json({ message: 'Evento no encontrado' });
-        }
-        res.json({ message: 'Atributo del evento actualizado correctamente' });
-    } catch (error) {
-        console.error("Error al actualizar atributo del evento:", error);
-        res.status(500).json({ message: 'Error interno del servidor' });
-    }
-};
+// // Obtener un evento por ID
+// export async function getEventoById(req, res) {
+//     try {
+//         const { id } = req.params;
+//         const evento = await getEventoByIdFrom(id);
+//         if (!evento) {
+//             return res.status(404).json({ error: "Evento no encontrado" });
+//         }
+//         res.json(evento);
+//     } catch (error) {
+//         res.status(500).json({ error: "Error al obtener el evento" });
+//     }
+// }
 
-//DELETE /api/usuarios/:nombre_usuario/eventos/:nombre_evento
-//Elimina un evento
-export const deleteEvent = async (req, res) => {
-    const { nombre_usuario, nombre_evento } = req.params;
+// Obtener un evento por código
+export async function getEventoByCodigoController(req, res) {
     try {
-        const id_usuario = await getUserNamebyId(nombre_usuario);
-        if (!id_usuario) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        const evento = await getEventoFromOrganization(id_usuario, nombre_evento);
+        const { codigo } = req.params;
+        const evento = await getEventoByCodigo(codigo);
         if (!evento) {
-            return res.status(404).json({ message: 'Evento no encontrado' });
-        }
-        const creador = evento.id_creador;
-        if (creador !== id_usuario) {
-            return res.status(403).json({ message: 'No tiene permiso para modificar este evento' });
-        }
-        const result = await deleteEvento(evento.id);
-        if (result === 0) {
-            return res.status(404).json({ message: 'Evento no encontrado' });
-        }
-        res.json({ message: 'Evento eliminado correctamente' });
-    } catch (error) {
-        console.error("Error al eliminar evento:", error);
-        res.status(500).json({ message: 'Error interno del servidor' });
-    }
-};
-
-// Nueva función para obtener un evento específico de una organización concreta
-export const getEventFromOrganization = async (req, res) => {
-    const { nombre_organizacion, nombre_evento } = req.params;
-    try {
-        const id_organizacion = await getOrganizacionIdByName(nombre_organizacion);
-        if (!id_organizacion) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        const evento = await getEventoFromOrganization(id_organizacion, nombre_evento);
-        if (!evento) {
-            return res.status(404).json({ message: 'Evento no encontrado' });
+            return res.status(404).json({ error: "Evento no encontrado" });
         }
         res.json(evento);
     } catch (error) {
-        console.error("Error al obtener evento:", error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        res.status(500).json({ error: "Error al obtener el evento" });
     }
-};
+}
 
-// Nueva función para obtener todos los eventos de una organización concreta
-export const getAllEventsFromOrganization = async (req, res) => {
-    const { nombre_organizacion } = req.params;
+// Crear un nuevo evento
+export async function createNewEvento(req, res) {
+    console.log();
     try {
-        const id_organizacion = await getOrganizacionIdByName(nombre_organizacion);
-        if (!id_organizacion) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        const eventos = await getEventosFromOrganization(id_organizacion);
-        res.json(eventos);
+        const evento = req.body;
+
+        const codigo = await generarCodigo(evento.nombre_evento);
+        evento.codigo = codigo;
+
+        console.log(evento);
+
+        const {codigo_org} = req.params;
+        const organizacion = await getOrganizacionByCodigo(codigo_org);
+
+        console.log(organizacion.id);
+
+
+        const newEventoId = await createEvento(evento,organizacion.id);
+        res.status(201).json({ id: newEventoId });
     } catch (error) {
-        console.error("Error al obtener eventos:", error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        res.status(500).json({ error: "Error al crear el evento" });
     }
-};
+}
+
+// Actualizar un evento existente
+export async function updateExistingEvento(req, res) {
+    try {
+        const { codigo_evento } = req.params;
+        const evento = await getEventoByCodigo(codigo_evento);
+        const eventoActualizado = req.body;
+        await updateEvento(evento.id, eventoActualizado);
+        res.json({ message: "Evento actualizado correctamente" });
+    } catch (error) {
+        res.status(500).json({ error: "Error al actualizar el evento" });
+    }
+}
+
+// Eliminar un evento por ID
+export async function deleteEventoById(req, res) {
+    try {
+        const { codigo_evento } = req.params;
+        const evento = await getEventoByCodigo(codigo_evento);
+        if (!evento) {
+            return res.status(404).json({ error: "Evento no encontrado" });
+        }
+        await deleteEvento(evento.id);
+        res.json({ message: "Evento eliminado correctamente" });
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar el evento" });
+    }
+}

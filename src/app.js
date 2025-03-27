@@ -1,5 +1,6 @@
 import express from 'express';
 import userOrgRouter from './routes/userOrganizacionRoutes.js';
+import eventosRouter from './routes/eventosRoutes.js';
 import authRouter from './routes/authRoutes.js';
 import asistentesRoutes from './routes/asistentesRoutes.js';
 import orgRouter from './routes/organizacionRouter.js';

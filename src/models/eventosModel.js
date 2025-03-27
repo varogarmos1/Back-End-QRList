@@ -1,12 +1,13 @@
 import { pool } from '../config/db.js';
 
-export async function getEventosFromOrganization(id) {
+// Obtener todos los eventos
+export async function getAllEventosFromOrg(id_organizacion) {
     try {
         const [rows] = await pool.query(`
-            SELECT nombre_evento 
-            FROM eventos
-            WHERE id_organizacion = ?
-        `, [id]);
+            SELECT * 
+            FROM Eventos 
+            WHERE id_organizacion = ?`,
+            [id_organizacion]);
         return rows;
     } catch (error) {
         console.error("Error al obtener los eventos de la organizacion:", error);
@@ -14,88 +15,79 @@ export async function getEventosFromOrganization(id) {
     }
 }
 
-export async function getEventoIdByName(nombre) {
-    try {
-        const [rows] = await pool.query(
-            "SELECT id FROM eventos WHERE nombre_evento = ? LIMIT 1", 
-            [nombre]
+// Obtener un evento por ID
+export async function getEventoByIdFrom(id) {
+    try{
+
+        const [rows] = await pool.query(`SELECT * FROM Eventos WHERE id = ?`, [id]);
+        return rows[0];
+    }catch(error){
+        console.error("Error al obtener el evento:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar 
+    }  
+}
+
+// Obtener un evento por codigo
+export async function getEventoByCodigo(codigo) {
+    try{
+
+        const [rows] = await pool.query(`
+            SELECT * FROM Eventos WHERE codigo = ?`, [codigo]);
+            return rows[0];
+        }catch(error){ 
+            console.error("Error al obtener el evento:", error);
+            throw error; // Lanza el error para manejarlo en otro lugar
+        }
+    
+}
+// Crear un nuevo evento
+export async function createEvento(evento, id_organizacion) {
+    try{
+        const { nombre_evento, descripcion, codigo, fecha, ubicacion, aforo_maximo, estado } = evento;
+        const [result] = await pool.query(
+            `INSERT INTO Eventos (nombre_evento, descripcion, codigo, fecha, ubicacion, aforo_maximo, id_organizacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [nombre_evento, descripcion, codigo, fecha, ubicacion, aforo_maximo, id_organizacion, estado]
         );
-
-        // Verifica si el evento existe
-        if (rows.length > 0) {
-            return rows[0].id; // Retorna el ID del evento encontrado
-        } else {
-            return null; // Si no encuentra el evento, retorna null
+        return result.insertId;
+    }catch(error){
+        console.error("Error al crear evento:", error);
+        throw error; // Lanza el error para manejarlo en otro lugar 
         }
-    } catch (error) {
-        console.error("Error al obtener el ID del evento:", error);
+}
+
+// Actualizar un evento existente
+export async function updateEvento(id, evento) {
+    try{
+        const { nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, id_organizacion, estado } = evento;
+
+        // Obtener el evento actual de la base de datos
+        const eventoActual = await getEventoByIdFrom(id);
+
+        // Usar los valores actuales si no se proporcionan nuevos valores
+        const nuevoNombreEvento = nombre_evento !== undefined ? nombre_evento : eventoActual.nombre_evento;
+        const nuevaDescripcion = descripcion !== undefined ? descripcion : eventoActual.descripcion;
+        const nuevaFecha = fecha !== undefined ? fecha : eventoActual.fecha;
+        const nuevaUbicacion = ubicacion !== undefined ? ubicacion : eventoActual.ubicacion;
+        const nuevoAforoMaximo = aforo_maximo !== undefined ? aforo_maximo : eventoActual.aforo_maximo;
+        const nuevoIdOrganizacion = id_organizacion !== undefined ? id_organizacion : eventoActual.id_organizacion;
+        const nuevoEstado = estado !== undefined ? estado : eventoActual.estado;
+
+        await pool.query(
+            `UPDATE Eventos SET nombre_evento = ?, descripcion = ?, fecha = ?, ubicacion = ?, aforo_maximo = ?, id_organizacion = ?, estado = ? WHERE id = ?`,
+            [nuevoNombreEvento, nuevaDescripcion, nuevaFecha, nuevaUbicacion, nuevoAforoMaximo, nuevoIdOrganizacion, nuevoEstado, id]
+        );
+    }catch(error){ 
+        console.error("Error al actualizar evento:", error);
         throw error; // Lanza el error para manejarlo en otro lugar
     }
 }
 
-export async function getEventoFromOrganization(id_organizacion, nombre_evento) {
-    const [rows] = await pool.query(`
-        SELECT * 
-        FROM eventos
-        WHERE nombre_evento = ? AND id_organizacion = ?
-    `, [nombre_evento, id_organizacion]);
-    return rows[0];
-}
-
-export async function createEventos(nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, precio_entrada, id_organizacion, id_creador, estado) {
-    const [result] = await pool.query(`
-        INSERT INTO eventos (nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, precio_entrada, id_organizacion, id_creador, estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [nombre_evento, descripcion, fecha, ubicacion, aforo_maximo, precio_entrada, id_organizacion, id_creador, estado]);
-    return result.insertId;
-}
-
+// Eliminar un evento por ID
 export async function deleteEvento(id) {
-    try {
-        const [result] = await pool.query(`
-            DELETE FROM eventos WHERE id = ?;
-        `, [id]);
-        return result.affectedRows;
-    } catch (error) {
-        console.error("Error deleteEvento:", error);
-        throw error; // Lanza el error para manejarlo en otro lugar
-    }
-}
-
-export async function cambioAtributo(atributo, valor, id_evento) {
-    try {
-        const query = `
-            UPDATE eventos SET ${atributo} = ? WHERE id = ?;
-        `;  
-        const [result] = await pool.query(query, [valor, id_evento]);
-        return result.affectedRows;
-    } catch (error) {
-        console.error("Error en cambioAtributo:", error);
-        throw error; // Lanza el error para manejarlo en otro lugar
-    }
-}
-export async function getAllEventsFromUserOrganizations(id_usuario) {
-    try {
-        const [organizations] = await pool.query(`
-            SELECT id_organizacion 
-            FROM user_organizacion
-            WHERE id_usuario = ?
-        `, [id_usuario]);
-
-        if (organizations.length === 0) {
-            return [];
-        }
-
-        const organizationIds = organizations.map(org => org.id_organizacion);
-        const [events] = await pool.query(`
-            SELECT * 
-            FROM eventos
-            WHERE id_organizacion IN (?)
-        `, [organizationIds]);
-
-        return events;
-    } catch (error) {
-        console.error("Error al obtener los eventos de las organizaciones del usuario:", error);
+    try{
+        await pool.query(`DELETE FROM Eventos WHERE id = ?`, [id]);
+    }catch(error){
+        console.error("Error al eliminar evento:", error);
         throw error; // Lanza el error para manejarlo en otro lugar
     }
 }
