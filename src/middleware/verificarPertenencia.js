@@ -13,9 +13,9 @@ export async function verificarPertenencia(req, res, next) {
         console.log('Usuario autenticado');
         try{
             const id = req.usuario.id;
-            const {codigo} = req.params;
+            const {codigo_org} = req.params;
 
-            const org = await getOrganizacionByCodigo(codigo);
+            const org = await getOrganizacionByCodigo(codigo_org);
 
             const user = await getUserOrganizacion(id, org.id);
 

@@ -6,12 +6,13 @@ import {getOrganizacionByCodigo} from '../models/organizacionModel.js';
 dotenv.config();
 
 export function verificarPermisos(...permisosPermitidos) {
+    
     return async (req, res, next) => {
-        const { codigo } = req.params;
+        const { codigo_org } = req.params;
         if (!req.usuario) {
             return res.status(401).json({ error: 'Acceso denegado. Usuario no autenticado' });
         }
-        const organizacion = await getOrganizacionByCodigo(codigo);
+        const organizacion = await getOrganizacionByCodigo(codigo_org);
         if (!organizacion) {
             return res.status(404).json({ error: 'Organización no encontrada' });
         }
